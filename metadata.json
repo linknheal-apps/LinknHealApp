@@ -1,0 +1,8 @@
+{
+  "name": "Link & Heal",
+  "description": "Between-sessions mental health companion app for clients, couples, and therapists with strict per-entry privacy and RLS security enforcement.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
