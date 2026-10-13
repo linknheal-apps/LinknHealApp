@@ -1,0 +1,405 @@
+Link & Heal — Full Product & Technical Blueprint Page 1
+LINK & HEAL
+Full Product & Technical Blueprint
+UX/UI • Screens • Frontend • Backend • Database • Security • API • QA • Deployment
+English-only for Release 1, with a localization-ready architecture for adding Arabic and other
+languages later.
+Scope: client experience + therapist experience + couples/family privacy + clinical workflows + technical
+architecture. Client requirements and implementation recommendations are clearly separated.
+Source: Psychological Practice App Requirements — Version 1.0 — September 2026
+
+Link & Heal — Full Product & Technical Blueprint Page 2
+1. Product Vision & Boundaries
+Link & Heal connects what happens inside therapy sessions with structured between-session activity. The central
+loop is: assign → complete → organize → review → discuss → measure progress.
+Non-negotiable principles
+• Privacy first: features that conflict with privacy are redesigned or removed.
+• Client simplicity: routine actions such as mood should take about 60 seconds or less.
+• Clinical value: collected data should appear as a useful chart, alert, summary or clinical view.
+• Therapist control: the therapist decides what each client tracks and sees.
+• Professional boundaries: messaging, if enabled, is not an emergency channel.
+• Safety: risk workflows must not depend only on a therapist noticing a notification.
+Product is not
+• An AI therapist, social network, dating app or gamified wellness product.
+• An emergency-response service.
+• A replacement for therapist clinical judgment.
+• An EHR/telehealth-first platform; future integrations are supported by the architecture but are not required for Phase
+1.
+2. Platforms & Main Surfaces
+Surface Users Purpose
+Client mobile app Clients / partners / teens / family members Mood, assessments, homework, goals, progress, resources, consent and privacy
+Therapist mobile app Therapists Alerts, client review, pre-session view and quick actions.
+Therapist web dashboard Therapists / authorized admin roles Full management, analytics, libraries, reports and configuration.
+Backend API All roles Authentication, authorization, business rules, scoring, notifications, synchronizat
+Database + private storage System Clinical data, metadata, files and immutable audit records.
+Client requirement: iOS and Android from one codebase plus therapist web. The source document mentions Flutter
+or React-based native development; the exact framework remains open.
+3. Roles & Permission Model
+Role Access
+Therapist Own clients, clinical records for those clients, assignments, measures, homework, resources, alerts and reports.
+Adult client Own data and assigned work.
+Couple partner Own private data plus explicitly shared couple content.
+Teen Own data; guardian access only where explicitly permitted.
+Guardian Only allowed information; no detailed teen answers by default.
+Family member Own data plus explicitly shared family content.
+Admin assistant Administrative functions without clinical content.
+Recommended rule: the UI is never the security boundary. Every API request must be authorized against identity,
+role, therapist-client relationship, consent, visibility and resource ownership.
+4. Client App — Complete Page Map
+Page Purpose / main elements
+Welcome / Sign in Email/password, secure session, onboarding.
+
+Link & Heal — Full Product & Technical Blueprint Page 3
+Page Purpose / main elements
+Consent Plain-language consent, document version, signature/date, acceptance.
+Home Today: mood, tasks, assessments, goals, progress and safe navigation.
+Mood check-in 0–10 mood, emotions, optional fields, context and note.
+Mood history Weekly/monthly trends and session markers.
+Assessments Assigned measures, due state, completion and history.
+Assessment flow Item-by-item questionnaire, save/resume, submit.
+Assessment result Configured client-facing result; detailed clinical interpretation remains therapist-controlled.
+Homework Tasks, due dates, statuses and completion progress.
+Homework detail Instructions, interactive form or upload, draft/save/submit.
+Goals Treatment goals and GAS progress.
+Progress Unified timeline: mood + measures + homework + goals + sessions.
+Resources Therapist-sent articles, audio and exercises.
+Notifications Generic reminders/updates with no clinical content.
+Messages (optional) Therapist-client communication with boundary notice.
+Privacy &amp; security PIN/biometric, sessions, consent and privacy information.
+Settings Reminder time, quiet hours, accessibility and future language preference.
+5. Therapist App & Web — Complete Page Map
+Page Purpose
+Dashboard Client list with risk, missed homework, due measure and mood-drop signals.
+Pre-session summary Single view of what changed since last session.
+Client profile Timeline, mood, assessments, homework, goals, resources and permissions.
+Mood analytics Trend charts, session markers and configurable alert thresholds.
+Assessment center Library, assignment schedules, scoring, severity, item answers and RCI.
+Homework center Library, templates, assignments, submissions and comments.
+Goals / progress GAS, unified timeline and progress report.
+Couples workspace Partners, visibility, relationship check-ins and therapist-only gap view.
+Family workspace Linked accounts and configured shared/private information.
+Resources library Articles/audio/exercises and assignment.
+Messages Optional; per-client enable/disable and boundary notice.
+Reports / export PDF and CSV with authorization and consent rules.
+Client organization Clinic/funder tagging and filtering.
+Security / settings 2FA, sessions, consent/versioning and controlled configuration.
+Audit log Immutable access/change history.
+6. UX/UI Design System
+The interface should feel like a quiet professional room: calm, private, clear and emotionally safe—not like a hospital
+dashboard or game.
+Client UX
+
+Link & Heal — Full Product & Technical Blueprint Page 4
+• One primary action per screen.
+• Progressive disclosure: optional fields appear only when enabled by the therapist.
+• No pressure-based gamification, streaks or competitive mechanics.
+• Large touch targets, accessible type and simple language.
+• Clear task states: Not started / In progress / Completed / Missed.
+• Private/shared/clinical content visually separated.
+• Generic notifications and safe lock-screen behavior.
+• Offline mood entry should feel the same as online entry.
+Visual recommendations
+Area Direction
+Color Soft neutral foundation with restrained blue/teal accent; semantic risk colors only where needed.
+Cards Rounded, spacious, low-density; minimal shadows.
+Typography Readable system font stack, scalable/dynamic type.
+Navigation Simple bottom navigation for clients; sidebar/navigation rail for therapist web.
+Charts Simple line/bar charts with readable labels and session markers.
+Forms Short steps, autosave drafts, clear completion states.
+Accessibility WCAG 2.1 AA target, screen reader labels, contrast, focus order, scalable text.
+7. Localization — English Now, Languages Later
+Release 1 is English-only. The application should still be built around localization keys rather than hard-coded
+English strings.
+• Translation files separate from application logic.
+• Locale-aware date, time and number formatting.
+• Layouts tolerate longer translations.
+• Direction-aware layout so RTL can be enabled later.
+• Questionnaire content supports language/version metadata where licensing permits.
+• User language preference can be introduced without rewriting business logic.
+8. Mood Module — Detailed Behavior
+• Multiple entries per day.
+• Core value: 0–10 mood with expressive symbols.
+• Optional emotions: anxiety, sadness, anger, calm, hope.
+• Optional therapist-enabled fields: anxiety, sleep hours/quality, energy, irritability, substance craving.
+• Optional context tags: work, relationship, family, health and free text.
+• Client-selected reminder time.
+• Client weekly/monthly graphs; therapist graphs include session-date markers.
+• Example alert: drop of 3+ points for 3 consecutive days; threshold configurable per client.
+Recommendation: store the alert rule version/configuration used for each client so historical alerts remain
+explainable if defaults change.
+9. Assessment Engine
+• Therapist selects an assessment and schedule.
+• Client completes item-by-item with save/resume.
+• Scoring is server-side and based on versioned scoring rules.
+• Severity classification uses the validated cutoffs for that assessment version.
+• Item-level answers remain available to authorized therapists.
+
+Link & Heal — Full Product & Technical Blueprint Page 5
+• History shows scores over time.
+• RCI is calculated according to the agreed Truax & Jacobson (1991) method and validated by the therapist.
+• Custom questionnaires use controlled question/choice templates.
+Named measures in the source requirements
+PHQ-9, GAD-7, PCL-5, K10, CSI-4/CSI-16, RCADS, SRS/ORS, DAS and selected Gottman tools. Licensing/copyright
+must be verified before implementation; protected text is not copied without authorization.
+10. Safety / Risk Workflow
+Example required flow: client submits PHQ-9 item 9 > 0 → risk rule evaluates immediately → crisis-resource screen →
+therapist in-app/email notification → clear notice that therapist may not see it immediately → audit event.
+• The app states it is not an emergency service and is not monitored 24/7.
+• Risk resources are configurable.
+• No clinical detail appears in ordinary push notification text.
+• Risk events are auditable.
+• The workflow is tested during poor connectivity and notification failure.
+11. Couples Privacy — Critical Architecture
+Each partner has a completely separate account. A couple profile links the accounts but does not merge their
+private data.
+Visibility Who can see it?
+PRIVATE Author + therapist. Default.
+SHARED Both partners + therapist.
+CLINICAL_ONLY Therapist only; used for sensitive clinical/safety information.
+• Authorization is enforced server-side and preferably at database level as defense in depth.
+• Direct object IDs and API calls must not bypass visibility.
+• Unauthorized records are omitted rather than merely hidden by the UI.
+• Separation or consent withdrawal immediately revokes partner access.
+• Quick-exit closes/obscures the app immediately.
+• IPV screening is individual and never exposed to the other partner.
+• Relationship check-ins are completed separately; therapist can see a comparison/gap view.
+12. Homework, Resources & Goals
+• Homework library supports Word/PDF and interactive forms.
+• Templates: CBT thought record, behavioral activation, SUDS, ACT values, DBT diary card and sleep diary.
+• Assignments contain instructions, due date, frequency and reminders.
+• Client can complete in app or upload a handwritten-photo.
+• States: not started / in progress / completed / missed.
+• Therapist can comment on completed homework.
+• Completion percentage appears on therapist dashboard.
+• Resources include short articles and breathing/grounding audio.
+• Goals use Goal Attainment Scaling (−2 to +2).
+• Unified progress timeline combines mood, measures, homework, goals and session markers.
+• PDF progress report and CSV export are supported subject to permissions/consent.
+13. Notifications
+
+Link & Heal — Full Product & Technical Blueprint Page 6
+Event Safe text
+New homework You have a new task.
+Assessment You have a new task to complete.
+Therapist comment You have a new update.
+Resource You have a new resource.
+Reminder You have a reminder.
+Risk Do not expose clinical content in push text; use the defined safety flow.
+Client controls include reminder time, quiet hours and pause reminders.
+14. Recommended Frontend Architecture
+The source allows Flutter or React-based development. Recommendation: React Native + TypeScript for
+iOS/Android, with a React/Next.js-style web dashboard. This is an implementation recommendation, not a fixed
+client requirement.
+• Monorepo with shared types, validation schemas, design tokens and API client.
+• Feature modules: auth, consent, mood, assessments, homework, goals, progress, resources, notifications, couples,
+profile/settings.
+• Secure local storage and encrypted offline queue for mood.
+• Server-state caching with explicit invalidation after mutations.
+• Centralized UI permission helpers, while the server remains authoritative.
+• Automated critical-flow UI tests.
+UI → feature state/hooks → domain services → typed API client → secure storage/offline queue
+15. Recommended Backend Architecture
+Recommended: modular backend API, e.g. NestJS/TypeScript or equivalent. Keep business modules separate while
+deploying as a controlled application rather than a runtime plugin system.
+Module Responsibilities
+Identity/Auth Login, sessions, therapist 2FA, device/PIN/biometric coordination.
+Consent Documents, versions, signatures, dates, withdrawal.
+Clients Profiles and therapist-client relationships.
+Mood Entries, trends, thresholds, alert evaluation.
+Assessments Library metadata, assignments, responses, scoring, RCI.
+Homework Templates, assignments, submissions, comments.
+Goals Treatment goals, GAS and progress.
+Couples/Family Links, visibility, sharing, separation/revocation.
+Resources Articles, audio, assignments.
+Notifications Generic templates, schedules, quiet hours, delivery.
+Reports PDF/CSV generation.
+Audit Immutable access/change events.
+Admin Controlled operational configuration.
+16. Database — Recommended Model
+PostgreSQL is a strong fit because the system is relational, permission-heavy, transaction-sensitive and
+audit-oriented.
+
+Link & Heal — Full Product & Technical Blueprint Page 7
+Entity Purpose
+users / roles Identity and authorization.
+therapist_clients Explicit therapist-client relationship.
+consents / consent_versions Consent version/signature history.
+clients Profile and therapist-controlled configuration.
+mood_entries Mood and optional wellbeing/context.
+mood_alert_rules / alerts Versioned rules and generated alerts.
+assessments / versions Immutable assessment definitions.
+assignments / responses / response_items Assessment lifecycle and item-level data.
+scoring_rules / results Versioned scoring and severity.
+homework_templates / assignments / submissionsHomework lifecycle.
+goals / measurements GAS and progress.
+couples / family / memberships Relationship grouping.
+content_visibility PRIVATE / SHARED / CLINICAL_ONLY.
+resources / assignments Resource delivery.
+notifications / preferences Safe notifications and quiet hours.
+audit_events Immutable audit trail.
+files / file_metadata Private file storage metadata.
+Recommended defense in depth: API authorization + PostgreSQL Row-Level Security where practical + integration
+tests that actively attempt unauthorized access.
+17. API & Business Rules
+Representative endpoints:
+POST /auth/login
+POST /consents/accept
+GET /me
+GET /clients
+GET /clients/{id}/summary
+POST /clients/{id}/mood
+GET /clients/{id}/mood/trends
+POST /assessment-assignments
+POST /assessments/{id}/responses
+GET /clients/{id}/assessments
+POST /homework-assignments
+POST /homework/{id}/submit
+POST /goals
+POST /couples/{id}/visibility
+GET /couples/{id}/therapist-gap
+POST /resources/assign
+POST /reports/progress
+GET /audit-events
+Exact API contracts should be finalized during implementation and covered by authorization tests.
+18. Security Architecture
+Layer Control
+Transport TLS 1.2+ and secure certificates.
+At rest AES-256 or equivalent approved encryption.
+Authentication Strong passwords; therapist MFA/2FA.
+Client unlock PIN/biometric app unlock.
+
+Link & Heal — Full Product & Technical Blueprint Page 8
+Layer Control
+Authorization Server-side role + relationship + visibility checks.
+Database Least privilege, encrypted backups, RLS where appropriate.
+Audit Immutable access/change records.
+Files Private storage + short-lived authorized URLs.
+Secrets Managed secrets; never source-controlled.
+Notifications Generic text; no clinical payload/lock-screen detail.
+Analytics No external analytics that transmit client data.
+AI No external AI processing without explicit consent/data-protection agreement.
+Testing Independent penetration test before launch and annually.
+Incidents Written breach response plan and required notifications.
+The source requirements specify Canadian-only hosting for servers, databases and backups. Examples named in the
+document include AWS ca-central-1 and Azure Canada Central.
+19. Threat Model
+Scenario Defense
+Partner accesses private answer API authorization + database policy + direct-ID tests.
+Notification exposes diagnosis Generic templates and minimal payloads.
+Lost/stolen phone PIN/biometric, session timeout, encrypted local data.
+Compromised therapist account 2FA, session controls, audit logging.
+Unauthorized client record access Relationship-based authorization.
+Leaked file URL Private storage + short-lived URLs.
+Offline device exposure Encrypted local store and minimal cached data.
+Unapproved vendor receives data Vendor/data-flow inventory and restrictions.
+Developer sees real data Synthetic data only for development/testing.
+20. Offline & File Handling
+• Mood entry works offline.
+• Sensitive offline data is encrypted.
+• Pending sync uses unique IDs and idempotent requests.
+• Clinical records are never silently overwritten on conflict.
+• Private files use object storage, with database metadata only.
+• Access URLs are short-lived and authorized.
+• Server enforces file type/size limits; malware scanning is recommended.
+21. AI Policy
+AI is not a required Phase 1 feature in the source requirements. If introduced later, it must not become an
+uncontrolled route for client data outside the approved environment.
+• Explicit consent before external AI processing.
+• Appropriate data-protection agreement.
+• No autonomous diagnosis or crisis decisions.
+• Therapist review before AI-generated clinical summaries enter a record.
+• Auditability of AI-related access and transformations.
+
+Link & Heal — Full Product & Technical Blueprint Page 9
+22. Hosting, Environments & Deployment
+Environment Purpose
+Local Synthetic data only.
+Development Feature integration and tests.
+Staging Production-like acceptance/security tests; no real client data.
+Production Canadian infrastructure; real data only after privacy/security acceptance.
+• Infrastructure as code is recommended.
+• CI: lint, type checks, unit/integration tests and security checks.
+• Separate secrets per environment.
+• Version-controlled database migrations.
+• Encrypted Canadian backups.
+• Operational logs contain no clinical content.
+23. QA & Acceptance
+Test layer Examples
+Unit Mood alerts, scoring, RCI, GAS, permission functions.
+Integration API authorization, DB policies, consent and notification flows.
+E2E Client assessment → score → therapist result.
+Security Partner isolation, IDOR/direct links, role escalation.
+Accessibility Screen reader, dynamic type, contrast, web keyboard/focus.
+Offline Create mood offline → reconnect → exactly-once sync.
+Performance Dashboard/pre-session summary under realistic volume.
+Penetration Independent external test before launch and annually.
+Critical acceptance tests from the requirements
+• PHQ-9 item 9 = 1 reaches therapist within the defined target and crisis screen appears.
+• Partner A cannot access Partner B private answers through UI, direct links or API.
+• Assessment scoring matches manual scoring in 20 therapist-defined cases.
+• No clinical content in notifications or lock-screen previews.
+• Every client-file access appears in audit log.
+• Future Arabic interface renders correctly RTL, including charts/tables.
+24. Data Lifecycle & Privacy Governance
+• Collect only what an enabled feature or clinical workflow needs.
+• Store consent version/date and withdrawal state.
+• Retention aligns with applicable professional record requirements and legal advice.
+• Secure final deletion after the approved retention period.
+• Exports are permission-checked and auditable.
+• Privacy impact assessment and legal review before launch.
+• Breach-response plan includes applicable Alberta privacy notifications.
+25. Development Roadmap
+
+Link & Heal — Full Product & Technical Blueprint Page 10
+Stage Scope Exit criteria
+0 — Foundation Architecture, design system, auth, environments, consent, security baseline.Threat model + architecture review + secure test environmen
+1 — MVP Mood, PHQ-9/GAD-7, safety, homework, basic dashboard, security. Acceptance tests + 5–10 client pilot readiness.
+2 — Clinical Expansion Couples privacy, more measures, RCI, GAS, reports, pre-session summary. Therapist validates calculations/workflows.
+3 — Advanced Family, form builder, optional messaging/audio, future integrations. Feature-specific privacy/security review.
+Launch Pen test, legal/privacy review, production, handoff. No critical security findings + documented acceptance.
+26. Ownership & Handoff
+• Client owns IP and source code.
+• Repository, cloud, Apple, Google Play and domain accounts remain under client control.
+• Developer uses test data only.
+• Milestone payments tied to acceptance criteria.
+• Warranty and maintenance/security updates documented separately.
+• Full technical documentation and handoff required.
+• Client retains access if the development relationship ends.
+27. Open Decisions Before Development
+• Final framework: Flutter vs React Native/React-based.
+• Exact Canadian cloud provider/region and backup design.
+• Licensed assessment list and approved text.
+• Final crisis-resource wording and safety protocol.
+• Retention/deletion schedule after privacy/legal review.
+• Whether messaging is in the initial release.
+• Final brand, colors, typography and component system.
+• Therapist alert/escalation workflow.
+• Penetration testing provider/scope.
+• Future practice-management integration target.
+28. Recommended High-Level Architecture
+Client iOS/Android
+↓
+Typed API Client + Secure Offline Queue
+↓
+Application API
+├─ Identity & Consent
+├─ Relationship Authorization
+├─ Mood & Alerts
+├─ Assessment & Scoring
+├─ Homework / Goals / Resources
+├─ Couples / Family Visibility
+├─ Notifications
+├─ Reports / Export
+└─ Immutable Audit
+↓
+PostgreSQL + Private Object Storage
+↓
+Canadian Infrastructure + Encrypted Backups
+Therapist Web Dashboard uses the same API and authorization model; it never bypasses the security layer to query the database directly.
+Final principle: the client experience should feel simple; the underlying architecture carries the
+complexity required for privacy, clinical integrity, relationship separation, auditability and safe
+data handling.
+
+Link & Heal — Full Product & Technical Blueprint Page 11
+This blueprint is based on the client requirements document. Technology and architecture sections marked as recommendations are
+implementation proposals and require confirmation before development.
