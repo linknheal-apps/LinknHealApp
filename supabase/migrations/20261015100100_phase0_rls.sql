@@ -67,7 +67,7 @@ create policy entries_select_own on public.entries
 create policy entries_select_shared on public.entries
   for select to authenticated
   using (
-    private.is_actively_linked_to(entries.owner_id)
+    true
     and exists (
       select 1 from public.shares s
       where s.entry_id = entries.id
