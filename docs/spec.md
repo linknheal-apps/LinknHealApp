@@ -44,7 +44,7 @@ longer read that entry.
 ## Functional Requirements
 - **FR1**: System MUST store every shareable entry with an `owner_id`.
 - **FR2**: System MUST express all cross-user visibility through a single
-  `shares` table (entry_type, entry_id, owner_id, shared_with_user_id).
+  `shares` table (entry_id, owner_id, shared_with_user_id), where `entry_id` references the single `entries` supertable.
 - **FR3**: System MUST enforce visibility via database-level RLS, not
   application-level filtering alone (defense in depth, but RLS is the
   authoritative boundary).
