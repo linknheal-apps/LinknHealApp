@@ -2,7 +2,7 @@
 -- Runs with `supabase test db` (pgTAP). Synthetic data only. Everything is rolled back.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(21);
+select plan(23);
 
 -- let the low-privilege roles write pgTAP's own temp bookkeeping tables
 do $$
@@ -27,6 +27,7 @@ insert into public.users (id, role) values
   ('a0000000-0000-0000-0000-000000000001', 'client'), ('b0000000-0000-0000-0000-000000000002', 'client'), ('c0000000-0000-0000-0000-000000000003', 'therapist'), ('d0000000-0000-0000-0000-000000000004', 'client');
 insert into public.partner_links (client_id, partner_id, status) values ('a0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', 'active');
 insert into public.therapist_client_links (therapist_id, client_id, status) values ('c0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'active');
+insert into public.therapist_client_links (therapist_id, client_id, status) values ('c0000000-0000-0000-0000-000000000003', 'd0000000-0000-0000-0000-000000000004', 'active');
 insert into public.entries (id, owner_id, entry_type, body) values
   ('e1000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'mood', '{"mood": 7}'),
   ('e2000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'reflection', '{"text": "private thought"}'),
@@ -105,6 +106,8 @@ select throws_ok($$insert into public.shares (entry_id, owner_id, shared_with_us
   '42501', 'permission denied for table shares', 'T8 forged share by direct insert is denied');
 select throws_ok($$select public.share_entry('e1000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000004')$$, 'P0001', 'share_not_allowed', 'T8 forged share to self via RPC is rejected');
 select throws_ok($$select public.share_entry('e1000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002')$$, 'P0001', 'share_not_allowed', 'T8 sharing someone else entry via RPC is rejected');
+select throws_ok($$select public.share_entry('e1000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000003')$$, 'P0001', 'share_not_allowed', 'T8b linked attacker cannot share someone else entry (ownership check alone blocks it)');
+select is((select count(*)::int from public.entries where id = 'e1000000-0000-0000-0000-000000000001'), 0, 'T8b attacker still cannot read the victim entry after the attempt');
 select is((select count(*)::int from public.entries where id = 'e1000000-0000-0000-0000-000000000001'), 0, 'T8 attacker still cannot read the victim entry');
 reset role;
 set local role authenticated;
