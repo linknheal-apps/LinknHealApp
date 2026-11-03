@@ -1,0 +1,22 @@
+name: DB privacy tests
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pgtap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Start local Supabase (synthetic data only)
+        run: supabase start
+      - name: Run pgTAP privacy tests
+        run: supabase test db
