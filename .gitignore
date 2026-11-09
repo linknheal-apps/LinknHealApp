@@ -10,6 +10,10 @@ build/
 .env.*
 !.env.example
 
+# Archives
+*.zip
+phase0-batch1.zip
+
 # Signing keys and certificates
 *.jks
 *.keystore
