@@ -1,0 +1,12 @@
+diff --git a/supabase/migrations/20261015100100_phase0_rls.sql b/supabase/migrations/20261015100100_phase0_rls.sql
+index 797a0e2..2a8a4d8 100644
+--- a/supabase/migrations/20261015100100_phase0_rls.sql
++++ b/supabase/migrations/20261015100100_phase0_rls.sql
+@@ -34,7 +34,6 @@ alter table public.partner_links force row level security;
+ alter table public.therapist_client_links enable row level security;
+ alter table public.therapist_client_links force row level security;
+ alter table public.entries enable row level security;
+-alter table public.entries force row level security;
+ alter table public.shares enable row level security;
+ alter table public.shares force row level security;
+ 

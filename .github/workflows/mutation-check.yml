@@ -1,0 +1,35 @@
+name: RLS Mutation Check
+
+on:
+  push:
+    branches: [chore/mutation-check]
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mutation: [M1, M2, M3, M4, M5, M6]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply mutation ${{ matrix.mutation }}
+        run: git apply .mutation/${{ matrix.mutation }}.patch
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Start local Supabase (synthetic data only)
+        run: supabase start
+      - name: Run pgTAP privacy tests (expect failure)
+        run: |
+          if supabase test db; then
+            echo "::error::SURVIVED ${{ matrix.mutation }}"
+            echo "SURVIVED ${{ matrix.mutation }}"
+            exit 1
+          else
+            echo "KILLED ${{ matrix.mutation }}"
+            exit 0
+          fi

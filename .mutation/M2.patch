@@ -1,0 +1,12 @@
+diff --git a/supabase/migrations/20261015100100_phase0_rls.sql b/supabase/migrations/20261015100100_phase0_rls.sql
+index 797a0e2..3a93fd1 100644
+--- a/supabase/migrations/20261015100100_phase0_rls.sql
++++ b/supabase/migrations/20261015100100_phase0_rls.sql
+@@ -71,7 +71,6 @@ create policy entries_select_shared on public.entries
+     and exists (
+       select 1 from public.shares s
+       where s.entry_id = entries.id
+-        and s.shared_with_user_id = (select auth.uid())
+     )
+   );
+ 

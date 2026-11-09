@@ -1,0 +1,13 @@
+diff --git a/supabase/migrations/20261015100100_phase0_rls.sql b/supabase/migrations/20261015100100_phase0_rls.sql
+index 797a0e2..3926fc2 100644
+--- a/supabase/migrations/20261015100100_phase0_rls.sql
++++ b/supabase/migrations/20261015100100_phase0_rls.sql
+@@ -94,7 +94,7 @@ create policy shares_select_parties on public.shares
+ 
+ create policy shares_delete_owner on public.shares
+   for delete to authenticated
+-  using (owner_id = (select auth.uid()));
++  using (true);
+ 
+ -- ---------- the only way to create a share ----------
+ create or replace function public.share_entry(p_entry_id uuid, p_recipient_id uuid)
