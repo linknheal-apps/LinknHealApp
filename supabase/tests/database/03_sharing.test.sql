@@ -2,7 +2,7 @@
 -- Runs with `supabase test db` (pgTAP). Synthetic data only. Everything is rolled back.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(24);
 
 -- let the low-privilege roles write pgTAP's own temp bookkeeping tables
 do $$
@@ -83,6 +83,10 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"c0000000-0000-0000-0000-000000000003","role":"authenticated"}';
 select is((select count(*)::int from public.entries where id = 'e2000000-0000-0000-0000-000000000002'), 1, 'therapist reads the entry shared with them');
 select is((select count(*)::int from public.entries where id = 'e1000000-0000-0000-0000-000000000001'), 0, 'therapist cannot read the entry not shared with them');
+reset role;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"b0000000-0000-0000-0000-000000000002","role":"authenticated"}';
+select is((select count(*)::int from public.entries where id = 'e2000000-0000-0000-0000-000000000002'), 0, 'partner cannot read entry shared with therapist only');
 reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a0000000-0000-0000-0000-000000000001","role":"authenticated"}';
