@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mutation: [M1, M2, M3, M4, M5, M6]
+        mutation: [M1, M2, M2b, M3, M4, M5, M6]
     steps:
       - uses: actions/checkout@v4
       - name: Apply mutation ${{ matrix.mutation }}
@@ -25,11 +25,20 @@ jobs:
         run: supabase start
       - name: Run pgTAP privacy tests (expect failure)
         run: |
-          if supabase test db; then
+          set +e
+          supabase test db > out.txt 2>&1
+          rc=$?
+          cat out.txt
+          echo "---- failing assertions ----"
+          grep -E "not ok|Failed test" out.txt
+          if [ $rc -eq 0 ]; then
             echo "::error::SURVIVED ${{ matrix.mutation }}"
             echo "SURVIVED ${{ matrix.mutation }}"
             exit 1
-          else
+          elif grep -q "not ok" out.txt; then
             echo "KILLED ${{ matrix.mutation }}"
             exit 0
+          else
+            echo "::error::INVALID ${{ matrix.mutation }} (failed without a failing assertion)"
+            exit 1
           fi
