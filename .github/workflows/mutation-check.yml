@@ -35,7 +35,7 @@ jobs:
             echo "::error::SURVIVED ${{ matrix.mutation }}"
             echo "SURVIVED ${{ matrix.mutation }}"
             exit 1
-          elif grep -q "not ok" out.txt; then
+          elif grep -qE "^# Failed test|Result: FAIL" out.txt; then
             echo "KILLED ${{ matrix.mutation }}"
             exit 0
           else
