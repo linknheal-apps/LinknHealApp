@@ -1,0 +1,13 @@
+diff --git a/supabase/migrations/20261015100100_phase0_rls.sql b/supabase/migrations/20261015100100_phase0_rls.sql
+index 797a0e2..9797f3a 100644
+--- a/supabase/migrations/20261015100100_phase0_rls.sql
++++ b/supabase/migrations/20261015100100_phase0_rls.sql
+@@ -53,7 +53,7 @@ create policy users_select_self on public.users
+ 
+ create policy partner_links_select_parties on public.partner_links
+   for select to authenticated
+-  using (client_id = (select auth.uid()) or partner_id = (select auth.uid()));
++  using (true);
+ 
+ create policy tc_links_select_parties on public.therapist_client_links
+   for select to authenticated
