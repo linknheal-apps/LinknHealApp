@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mutation: [M1, M2, M2b, M3, M4, M5, M6, M7, M8]
+        mutation: [M1, M2, M2b, M3, M4, M5, M6, M7, M7b, M8]
     steps:
       - uses: actions/checkout@v4
       - name: Apply mutation ${{ matrix.mutation }}
