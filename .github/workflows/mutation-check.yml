@@ -2,7 +2,7 @@ name: RLS Mutation Check
 
 on:
   push:
-    branches: [chore/mutation-check]
+    branches: [chore/mutation-check, 'test/**']
 
 permissions:
   contents: read
