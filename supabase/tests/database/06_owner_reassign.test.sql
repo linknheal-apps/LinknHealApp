@@ -1,4 +1,9 @@
--- Owner-reassign mutation killer (M7: WITH CHECK on entries_update_own)
+-- Owner-reassign guard: an owner must not be able to transfer an entry to another user.
+-- Protection is layered: (1) entries_update_own WITH CHECK, and (2) PostgreSQL also applies the
+-- SELECT policy USING (entries_select_own) to the NEW row of an UPDATE when SELECT privilege is
+-- required (here: the WHERE clause). Either layer alone blocks the reassign (SQLSTATE 42501).
+-- Mutation evidence (CI, commit 739ba77): M7 (layer 1 opened) SURVIVES = equivalent by layering;
+-- M7b (layers 1+2 opened) is KILLED by tests 2-4 of this file. This file kills M7b, not M7.
 -- Runs with `supabase test db` (pgTAP). Synthetic data only. Everything is rolled back.
 begin;
 create extension if not exists pgtap with schema extensions;
