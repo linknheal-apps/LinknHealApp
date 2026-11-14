@@ -52,24 +52,28 @@ select throws_ok(
   $$insert into private.audit_events (action, subject_type, subject_id, actor_id, prev_hash, hash)
     values ('entry.read', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid, 'a0000000-0000-0000-0000-000000000001'::uuid, '0', '0')$$,
   '42501',
+  null,
   'anon cannot insert into audit_events'
 );
 
 select throws_ok(
   $$update private.audit_events set action = 'tamper'$$,
   '42501',
+  null,
   'anon cannot update audit_events'
 );
 
 select throws_ok(
   $$delete from private.audit_events$$,
   '42501',
+  null,
   'anon cannot delete from audit_events'
 );
 
 select throws_ok(
   $$truncate private.audit_events$$,
   '42501',
+  null,
   'anon cannot truncate audit_events'
 );
 
@@ -82,24 +86,28 @@ select throws_ok(
   $$insert into private.audit_events (action, subject_type, subject_id, actor_id, prev_hash, hash)
     values ('entry.read', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid, 'a0000000-0000-0000-0000-000000000001'::uuid, '0', '0')$$,
   '42501',
+  null,
   'authenticated cannot insert into audit_events'
 );
 
 select throws_ok(
   $$update private.audit_events set action = 'tamper'$$,
   '42501',
+  null,
   'authenticated cannot update audit_events'
 );
 
 select throws_ok(
   $$delete from private.audit_events$$,
   '42501',
+  null,
   'authenticated cannot delete from audit_events'
 );
 
 select throws_ok(
   $$truncate private.audit_events$$,
   '42501',
+  null,
   'authenticated cannot truncate audit_events'
 );
 
@@ -116,6 +124,7 @@ set local role anon;
 select throws_ok(
   $$select private.write_audit_event('entry.read', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   '42501',
+  null,
   'anon execution of write_audit_event is denied'
 );
 
@@ -125,15 +134,18 @@ set local request.jwt.claims = '{"sub":"a0000000-0000-0000-0000-000000000001","r
 select throws_ok(
   $$select private.write_audit_event('entry.read', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   '42501',
+  null,
   'authenticated execution of write_audit_event is denied'
 );
 
 -- (c) Called as owner role inside test, takes NO actor parameter; actor_id equals auth.uid(); with auth.uid() null it raises
 reset role;
+set local request.jwt.claims = '';
 
 select throws_ok(
   $$select private.write_audit_event('entry.read', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   'P0001',
+  null,
   'writer raises when auth.uid() is null'
 );
 
@@ -184,18 +196,21 @@ select is(
 select throws_ok(
   $$select private.write_audit_event('invalid action with spaces', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   '23514',
+  null,
   'action with spaces is rejected by check constraint'
 );
 
 select throws_ok(
   $$select private.write_audit_event('alice@test.invalid', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   '23514',
+  null,
   'action with email-like characters is rejected by check constraint'
 );
 
 select throws_ok(
   $$select private.write_audit_event('entry.read', 'Client Entry', 'e1000000-0000-0000-0000-000000000001'::uuid)$$,
   '23514',
+  null,
   'subject_type with spaces and capitals is rejected by check constraint'
 );
 
@@ -203,18 +218,21 @@ select throws_ok(
 select throws_ok(
   $$update private.audit_events set action = 'tamper'$$,
   'P0001',
+  null,
   'trigger raises on UPDATE even for table owner'
 );
 
 select throws_ok(
   $$delete from private.audit_events where id = (select id from private.audit_events limit 1)$$,
   'P0001',
+  null,
   'trigger raises on DELETE even for table owner'
 );
 
 select throws_ok(
   $$truncate private.audit_events$$,
   'P0001',
+  null,
   'trigger raises on TRUNCATE even for table owner'
 );
 
@@ -275,18 +293,14 @@ select is(
 -- Delete middle row
 do $$
 declare
-  v_id1 uuid;
-  v_id2 uuid;
-  v_at1 timestamptz;
-  v_at2 timestamptz;
   v_mid_id uuid;
 begin
-  -- Restore order
-  select id into v_id1 from private.audit_events order by at asc limit 1;
-  select id into v_id2 from private.audit_events order by at desc limit 1;
-  -- delete the middle row
-  select id into v_mid_id from private.audit_events order by at asc offset 1 limit 1;
+  -- First restore timestamps so chain is valid again
   alter table private.audit_events disable trigger user;
+  update private.audit_events set at = clock_timestamp() where action = 'entry.share';
+
+  -- Identify the middle event (action = 'entry.update') and delete it
+  select id into v_mid_id from private.audit_events where action = 'entry.update';
   delete from private.audit_events where id = v_mid_id;
   alter table private.audit_events enable trigger user;
 end $$;
