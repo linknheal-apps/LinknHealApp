@@ -31,7 +31,7 @@ begin
   for r in
     select
       n.nspname,
-      format('%I(%s)', p.proname, pg_get_function_identity_arguments(p.oid)) as sig,
+      format('%I(%s)', p.proname, oidvectortypes(p.proargtypes)) as sig,
       p.prosecdef,
       coalesce(p.proconfig::text, '<null>') as proconfig,
       coalesce(p.proacl::text, '<null>') as proacl,
@@ -51,7 +51,7 @@ end $$;
 -- a) schema private: NO function is executable by PUBLIC, anon or authenticated
 select is_empty(
   $$
-    select format('%I.%I(%s)', n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)) as offending_function
+    select format('%I.%I(%s)', n.nspname, p.proname, oidvectortypes(p.proargtypes)) as offending_function
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'private'
@@ -73,7 +73,7 @@ select is_empty(
 -- b) schema public: NO function is executable by PUBLIC or anon
 select is_empty(
   $$
-    select format('%I.%I(%s)', n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)) as offending_function
+    select format('%I.%I(%s)', n.nspname, p.proname, oidvectortypes(p.proargtypes)) as offending_function
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
@@ -95,7 +95,7 @@ select is_empty(
 -- Allowlist built from current catalog
 select set_eq(
   $$
-    select format('%I(%s)', p.proname, pg_get_function_identity_arguments(p.oid)) as func_sig
+    select format('%I(%s)', p.proname, oidvectortypes(p.proargtypes)) as func_sig
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
@@ -120,7 +120,7 @@ select set_eq(
 -- d) every SECURITY DEFINER function in schemas public and private has a fixed search_path in proconfig
 select is_empty(
   $$
-    select format('%I.%I(%s)', n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)) as offending_function
+    select format('%I.%I(%s)', n.nspname, p.proname, oidvectortypes(p.proargtypes)) as offending_function
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('public', 'private')
@@ -137,7 +137,7 @@ select is_empty(
 -- e) functions in public/private referencing write_audit_event (excluding write_audit_event itself) match empty allowlist
 select set_eq(
   $$
-    select format('%I.%I(%s)', n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)) as func_sig
+    select format('%I.%I(%s)', n.nspname, p.proname, oidvectortypes(p.proargtypes)) as func_sig
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('public', 'private')
