@@ -2,7 +2,7 @@
 -- Runs with `supabase test db` (pgTAP). Synthetic data only. Everything is rolled back.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(36);
 
 -- let the low-privilege roles write pgTAP's own temp bookkeeping tables
 do $$
@@ -245,12 +245,20 @@ begin
   select private.write_audit_event('entry.share', 'entry', 'e1000000-0000-0000-0000-000000000001'::uuid) into v_id;
 end $$;
 
--- Tampering a row (as superuser bypassing triggers temporarily)
+-- 1. Modify one row
+select is(
+  private.verify_audit_events(),
+  true,
+  'chain is valid before modifying one row'
+);
+
+savepoint tamper_modify;
+
 do $$
 declare
   v_mid_id uuid;
 begin
-  select id into v_mid_id from private.audit_events order by at asc offset 1 limit 1;
+  select id into v_mid_id from private.audit_events where action = 'entry.update';
   alter table private.audit_events disable trigger user;
   update private.audit_events set action = 'tampered.action' where id = v_mid_id;
   alter table private.audit_events enable trigger user;
@@ -262,23 +270,27 @@ select is(
   'verification returns false after tampering one row'
 );
 
--- Reordering a pair (swap E1 and E2 timestamps)
+rollback to savepoint tamper_modify;
+
+-- 2. Reorder a pair
+select is(
+  private.verify_audit_events(),
+  true,
+  'chain is valid before reordering a pair'
+);
+
+savepoint tamper_reorder;
+
 do $$
 declare
   v_id1 uuid;
   v_id2 uuid;
   v_at1 timestamptz;
   v_at2 timestamptz;
-  v_mid_id uuid;
 begin
-  -- Restore tampered action on middle row first
-  select id into v_mid_id from private.audit_events order by at asc offset 1 limit 1;
-  alter table private.audit_events disable trigger user;
-  update private.audit_events set action = 'entry.update' where id = v_mid_id;
-
-  -- Swap timestamps of first and second event
   select id, at into v_id1, v_at1 from private.audit_events order by at asc limit 1;
   select id, at into v_id2, v_at2 from private.audit_events order by at asc offset 1 limit 1;
+  alter table private.audit_events disable trigger user;
   update private.audit_events set at = v_at2 where id = v_id1;
   update private.audit_events set at = v_at1 where id = v_id2;
   alter table private.audit_events enable trigger user;
@@ -290,17 +302,23 @@ select is(
   'verification returns false after reordering a pair'
 );
 
--- Delete middle row
+rollback to savepoint tamper_reorder;
+
+-- 3. Delete middle row
+select is(
+  private.verify_audit_events(),
+  true,
+  'chain is valid before deleting middle row'
+);
+
+savepoint tamper_delete;
+
 do $$
 declare
   v_mid_id uuid;
 begin
-  -- First restore timestamps so chain is valid again
-  alter table private.audit_events disable trigger user;
-  update private.audit_events set at = clock_timestamp() where action = 'entry.share';
-
-  -- Identify the middle event (action = 'entry.update') and delete it
   select id into v_mid_id from private.audit_events where action = 'entry.update';
+  alter table private.audit_events disable trigger user;
   delete from private.audit_events where id = v_mid_id;
   alter table private.audit_events enable trigger user;
 end $$;
@@ -310,6 +328,8 @@ select is(
   false,
   'verification returns false after deleting middle row'
 );
+
+rollback to savepoint tamper_delete;
 
 reset role;
 select * from finish();
