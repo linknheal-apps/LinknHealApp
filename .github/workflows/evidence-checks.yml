@@ -68,7 +68,12 @@ jobs:
         if: always()
         run: |
           fail=0
-          base="origin/$BASE_REF"
+          base="origin/${BASE_REF:-main}"
+          echo "Base: $base"
+          if ! git rev-parse --verify "$base" >/dev/null 2>&1; then
+            echo "::error::Base ref cannot be resolved: $base"
+            exit 1
+          fi
 
           touched=$(git diff --name-status "$base"...HEAD -- supabase/migrations | grep -vE '^A' || true)
           if [ -n "$touched" ]; then
