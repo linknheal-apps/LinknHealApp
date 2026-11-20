@@ -65,7 +65,7 @@ jobs:
           exit $fail
 
       - name: Migration and test change review
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           fail=0
           base="origin/${BASE_REF:-main}"
