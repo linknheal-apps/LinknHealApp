@@ -90,8 +90,9 @@ jobs:
             | grep -E '^-' | grep -vE '^---' \
             | grep -E '\b(ok|is|isnt|throws_ok|lives_ok|results_eq|is_empty|row_eq|policies_are)[[:space:]]*\(' || true)
           if [ -n "$removed" ]; then
-            echo "::warning::Test assertions removed or changed (check that none was weakened):"
+            echo "::error::Test assertions removed or changed (check that none was weakened):"
             echo "$removed"
+            fail=1
           fi
 
           {
