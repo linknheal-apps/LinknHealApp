@@ -79,7 +79,7 @@ jobs:
 
           loose=$(git diff -U0 "$base"...HEAD -- supabase/migrations \
             | grep -E '^\+' | grep -vE '^\+\+\+' | grep -vE '^\+[[:space:]]*--' \
-            | grep -iE 'using[[:space:]]*\(true\)|with[[:space:]]+check[[:space:]]*\(true\)|disable row level security|no force row level security|[[:space:]]to[[:space:]]+(anon|public)\b' || true)
+            | grep -iE 'using[[:space:]]*\([[:space:]]*true[[:space:]]*\)|with[[:space:]]+check[[:space:]]*\([[:space:]]*true[[:space:]]*\)|disable row level security|no force row level security|[[:space:]]to[[:space:]]+(anon|public)\b' || true)
           if [ -n "$loose" ]; then
             echo "::error::Permissive SQL added in a migration (review the policy):"
             echo "$loose"
