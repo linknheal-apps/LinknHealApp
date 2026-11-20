@@ -65,6 +65,7 @@ jobs:
           exit $fail
 
       - name: Migration and test change review
+        if: always()
         run: |
           fail=0
           base="origin/$BASE_REF"
