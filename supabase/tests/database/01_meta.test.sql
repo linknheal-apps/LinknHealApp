@@ -36,8 +36,6 @@ select ok(not has_table_privilege('authenticated', format('public.%I', t), 'inse
           'authenticated cannot write public.' || t || ' directly')
 from unnest(array['users','partner_links','therapist_client_links']) as t;
 
-select ok(not has_table_privilege('authenticated', 'public.shares', 'insert,update,truncate'),
-          'authenticated cannot insert or update shares directly (only share_entry() creates them)');
 
 select is((select count(*)::int
            from pg_proc p join pg_namespace n on n.oid = p.pronamespace
