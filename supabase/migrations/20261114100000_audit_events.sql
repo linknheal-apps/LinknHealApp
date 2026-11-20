@@ -236,3 +236,4 @@ end;
 $$;
 
 revoke all on function private.verify_audit_events() from public, anon, authenticated;
+-- mutation test comment
