@@ -65,10 +65,15 @@ jobs:
           exit $fail
 
       - name: Migration and test change review
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           fail=0
-          base="origin/$BASE_REF"
+          base="origin/${BASE_REF:-main}"
+          echo "Base: $base"
+          if ! git rev-parse --verify "$base" >/dev/null 2>&1; then
+            echo "::error::Base ref cannot be resolved: $base"
+            exit 1
+          fi
 
           touched=$(git diff --name-status "$base"...HEAD -- supabase/migrations | grep -vE '^A' || true)
           if [ -n "$touched" ]; then
@@ -79,7 +84,7 @@ jobs:
 
           loose=$(git diff -U0 "$base"...HEAD -- supabase/migrations \
             | grep -E '^\+' | grep -vE '^\+\+\+' | grep -vE '^\+[[:space:]]*--' \
-            | grep -iE 'using[[:space:]]*\(true\)|with[[:space:]]+check[[:space:]]*\(true\)|disable row level security|no force row level security|[[:space:]]to[[:space:]]+(anon|public)\b' || true)
+            | grep -iE 'using[[:space:]]*\([[:space:]]*true[[:space:]]*\)|with[[:space:]]+check[[:space:]]*\([[:space:]]*true[[:space:]]*\)|disable row level security|no force row level security|[[:space:]]to[[:space:]]+(anon|public)\b' || true)
           if [ -n "$loose" ]; then
             echo "::error::Permissive SQL added in a migration (review the policy):"
             echo "$loose"
@@ -90,8 +95,9 @@ jobs:
             | grep -E '^-' | grep -vE '^---' \
             | grep -E '\b(ok|is|isnt|throws_ok|lives_ok|results_eq|is_empty|row_eq|policies_are)[[:space:]]*\(' || true)
           if [ -n "$removed" ]; then
-            echo "::warning::Test assertions removed or changed (check that none was weakened):"
+            echo "::error::Test assertions removed or changed (check that none was weakened):"
             echo "$removed"
+            fail=1
           fi
 
           {
