@@ -1,0 +1,420 @@
+{
+  "_readme": [
+    "Status codes: d = done, g = in progress, u = unconfirmed, t = not started, p = postponed by Ahmed explicitly.",
+    "Task tuple: [title, status, note, fixes, date]. note, fixes and date (YYYY-MM-DD, only for d) are optional. fixes is a list of [title, status].",
+    "Never mark d without evidence: a merged PR number, a commit hash, or a raw CI run id in the note.",
+    "If the evidence is not decisive, use u. Do not guess.",
+    "Update asof and statuses in the same PR that changes the work. Do not edit unrelated tasks.",
+    "Phase grouping is chronological and was assembled by Claude.",
+    "File encoding: UTF-8 without BOM."
+  ],
+  "name": "Link & Heal",
+  "asof": "24 نوفمبر 2026",
+  "start": "2026-10-14",
+  "phases": [
+    {
+      "t": "تنضيف الريبو والإعداد",
+      "r": "14–24 أكتوبر",
+      "k": [
+        [
+          "مسح الكود الغلط من commit 117e49c على branch chore/phase0-reset",
+          "d"
+        ],
+        [
+          "ربط Supabase cloud (ca-central-1) بالـ CLI",
+          "d"
+        ],
+        [
+          "مسح الجداول والدوال اللي اتعملت بره الـ migrations",
+          "d"
+        ],
+        [
+          "ربط ChatGPT بـ GitHub وSupabase",
+          "d"
+        ]
+      ]
+    },
+    {
+      "t": "الـ schema والـ RLS",
+      "r": "أكتوبر",
+      "k": [
+        [
+          "migrations الـ schema والـ RLS (5 جداول) مطبقة على الـ cloud",
+          "d"
+        ],
+        [
+          "اختبارات pgTAP في CI (77 اختبار أخضر)",
+          "d"
+        ],
+        [
+          "3 mutation checks على branches مؤقتة",
+          "d",
+          "",
+          [
+            [
+              "قراءة الـ link وقت الـ SELECT",
+              "d"
+            ],
+            [
+              "تسريب الـ share",
+              "d"
+            ],
+            [
+              "فحص ملكية الـ entry",
+              "d"
+            ]
+          ]
+        ],
+        [
+          "T018: مقارنة الـ migrations بالنسخة الأصلية",
+          "d"
+        ],
+        [
+          "قرار D2: جدول entries واحد + shares.entry_id",
+          "d"
+        ],
+        [
+          "تعديل FR2 في docs/spec.md",
+          "d"
+        ],
+        [
+          "PR #1 ودمج في main + ruleset protect-main",
+          "d"
+        ]
+      ]
+    },
+    {
+      "t": "اختبارات الخصوصية الموسّعة",
+      "r": "أكتوبر–نوفمبر",
+      "k": [
+        [
+          "PR #3: اختبارات 05–07 (93 اختبار)",
+          "d"
+        ],
+        [
+          "تجارب M2 وM7 (متوثقة، branch محتفظ بيه من غير دمج)",
+          "d"
+        ]
+      ]
+    },
+    {
+      "t": "طبقة الـ API (D4) وسجل التدقيق",
+      "r": "نوفمبر",
+      "k": [
+        [
+          "قرار D4 (هجين) وSpec Addendum 001",
+          "d",
+          "PR #4"
+        ],
+        [
+          "T003a: skeleton للـ functions وzod",
+          "d",
+          "PR #5",
+          [
+            [
+              "Deno import map لـ zod",
+              "g"
+            ],
+            [
+              "مراجعة package-lock.json",
+              "g"
+            ]
+          ]
+        ],
+        [
+          "T003b: جدول audit_events",
+          "d",
+          "PR #6",
+          [
+            [
+              "seq بدون فجوات + hash مشترك",
+              "d"
+            ],
+            [
+              "الـ triggers ENABLE ALWAYS",
+              "d"
+            ]
+          ]
+        ],
+        [
+          "T003c: اختبار صلاحيات الدوال",
+          "d",
+          "PR #7",
+          null,
+          "2026-11-20"
+        ],
+        [
+          "تطبيق migration الـ audit_events على الـ cloud",
+          "d",
+          "21 نوفمبر",
+          null,
+          "2026-11-21"
+        ],
+        [
+          "تنضيف رسالة «planned 45 but ran 42» في 08_audit_events",
+          "t",
+          "موجودة على main كمان ومش بتكسر الاختبارات"
+        ]
+      ]
+    },
+    {
+      "t": "فحوصات الـ CI",
+      "r": "20 نوفمبر",
+      "k": [
+        [
+          "PR #8: workflow الـ evidence checks",
+          "d",
+          "",
+          null,
+          "2026-11-20"
+        ],
+        [
+          "PR #10: يفشل لو assertions اتشالت أو اتضعفت",
+          "d",
+          "",
+          null,
+          "2026-11-20"
+        ],
+        [
+          "PR #9: mutation proof (اتقفل من غير دمج)",
+          "d",
+          "",
+          null,
+          "2026-11-20"
+        ]
+      ]
+    },
+    {
+      "t": "فحوصات الـ Dashboard والـ cloud",
+      "r": "21–23 نوفمبر",
+      "k": [
+        [
+          "فحص الـ catalog على الـ cloud (RLS وFORCE والصلاحيات)",
+          "d",
+          "",
+          null,
+          "2026-11-21"
+        ],
+        [
+          "الـ private schema مش متعرّض في الـ Data API",
+          "d",
+          "",
+          null,
+          "2026-11-21"
+        ],
+        [
+          "تأكيد إن Anonymous sign-ins مقفولة",
+          "d",
+          "مقفولة، وmanual linking كمان",
+          null,
+          "2026-11-22"
+        ],
+        [
+          "قراءة تحذيرات Security Advisor والـ Info",
+          "d",
+          "0 errors. share_entry مقصودة، وrls_auto_enable قرارها لسه مفتوح",
+          null,
+          "2026-11-22"
+        ],
+        [
+          "مقارنة share_entry على الـ cloud بالـ migration",
+          "d",
+          "متطابقين منطقيًا",
+          null,
+          "2026-11-22"
+        ],
+        [
+          "إيقاف «Automatically expose new tables»",
+          "d",
+          "اتقفلت، وACL قبل وبعد محفوظين",
+          null,
+          "2026-11-23"
+        ],
+        [
+          "قرار default privileges بتاعت supabase_admin: CI test ولا revoke",
+          "t"
+        ],
+        [
+          "قرار revoke EXECUTE على rls_auto_enable",
+          "t",
+          "بعد ما نثبت إن ensure_rls لسه بيشتغل على جدول تجريبي"
+        ],
+        [
+          "قرار «Allow new users to sign up» (مفتوحة حاليًا)",
+          "t",
+          "قبل الـ pilot، والتطبيق بدعوات"
+        ]
+      ]
+    },
+    {
+      "t": "خريطة التطبيق وقرارات مفتوحة",
+      "r": "21–23 نوفمبر",
+      "k": [
+        [
+          "APP_MAP.md: مسودة للمراجعة",
+          "g",
+          "مش في الـ repo لسه، وعايزها بالإنجليزي"
+        ],
+        [
+          "decisions-form.html: 42 سؤال للمعالج",
+          "d",
+          "اتبنت، ومش عليها commit",
+          null,
+          "2026-11-22"
+        ],
+        [
+          "إجابات المعالج على الفورم + commit للملف",
+          "t"
+        ],
+        [
+          "صفحة الـ roadmap: تقويم وألوان وبرومبتات",
+          "d",
+          "",
+          null,
+          "2026-11-23"
+        ],
+        [
+          "ROADMAP.json في الـ repo عن طريق PR docs/roadmap",
+          "t",
+          "الملف في docs/ بس untracked"
+        ],
+        [
+          "قرار D1: المعالج يشوف المشارَك بس ولا كل حاجة",
+          "t",
+          "مع المحامي (D7)، وبيأثر على R3 ولوحة المعالج"
+        ]
+      ]
+    },
+    {
+      "t": "R3: شيل الـ SELECT المباشر للمعالج",
+      "r": "22–24 نوفمبر",
+      "k": [
+        [
+          "اختبار R3 الأحمر (10_r3_therapist_no_direct_read)",
+          "d",
+          "فشل 8 و9 بس زي المتوقع",
+          null,
+          "2026-11-22"
+        ],
+        [
+          "خطة R3 من Antigravity (docs/agent/R3_PLAN.md)",
+          "u",
+          "بتوصي بالخيار c، ومش مراجَعة لسه"
+        ],
+        [
+          "تقرير audit من Antigravity (agent/audit-2026-11-22)",
+          "u",
+          "مش متحقق منه لسه"
+        ],
+        [
+          "مراجعة Codex (قراءة فقط) لخطة R3",
+          "u",
+          "رجعت نتيجتها، ومش متحقق منها لسه"
+        ],
+        [
+          "قرار: معالج + شريك لنفس العميل (dual-role)",
+          "d",
+          "قبلت (أ): بيقرا المشارَك عن طريق مسار الشريك. اختبار 11_r3_dual_role",
+          null,
+          "2026-11-24"
+        ],
+        [
+          "تعديل الـ migration (20261124100000)",
+          "d",
+          "commit 538d1b6، والاختبار 10 بقى أخضر",
+          null,
+          "2026-11-24"
+        ],
+        [
+          "PR #12: دمج R3 في main",
+          "d",
+          "run 45381458615 على main: Files=11, Tests=163, PASS. الـ static-checks أحمر بقصد (السطر 84 اتقلب 1 لـ 0)، والـ guard فضل صارم",
+          null,
+          "2026-11-24"
+        ],
+        [
+          "تطبيق R3 على الـ cloud (db push)",
+          "d",
+          "pg_policies: entries_select_shared من غير فرع للمعالج",
+          null,
+          "2026-11-24"
+        ],
+        [
+          "mutation check",
+          "t"
+        ],
+        [
+          "اختبار service_role على share_entry",
+          "t"
+        ],
+        [
+          "اختبار PostgREST nested-query (مطلوب من R3)",
+          "t",
+          "PR منفصل بعد الدمج"
+        ]
+      ]
+    },
+    {
+      "t": "ترتيب الاعتماديات (hygiene)",
+      "r": "23 نوفمبر",
+      "k": [
+        [
+          "branch agent/hygiene: package-lock.json وdeno.json",
+          "g",
+          "اتعمله push، ومن غير PR لسه"
+        ],
+        [
+          "فتح PR للـ hygiene",
+          "t"
+        ],
+        [
+          "قرار ترقية zod",
+          "t",
+          "npm audit: ثغرة عالية، والحل ترقية breaking لـ 4.6.7"
+        ]
+      ]
+    },
+    {
+      "t": "قرار D3 وأول UI",
+      "r": "جاي",
+      "k": [
+        [
+          "قرار D3: Capacitor ولا React Native",
+          "t",
+          "الميل لـ Capacitor"
+        ],
+        [
+          "UI العميل: login + mood check-in",
+          "t"
+        ],
+        [
+          "لوحة المعالج",
+          "t",
+          "مستنية R3"
+        ]
+      ]
+    },
+    {
+      "t": "أفكار ومؤجل",
+      "r": "بعدين",
+      "k": [
+        [
+          "أداة test & diagnostic مستقلة",
+          "t"
+        ],
+        [
+          "archive وauto-delete للمعالج وحل امتلاء Supabase",
+          "t"
+        ],
+        [
+          "شغل AI Studio على branch ai-studio-test",
+          "t"
+        ],
+        [
+          "Lab منفصل + flood test",
+          "p"
+        ]
+      ]
+    }
+  ]
+}
