@@ -81,7 +81,7 @@ select lives_ok($$select public.share_entry('e2000000-0000-0000-0000-00000000000
 reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"c0000000-0000-0000-0000-000000000003","role":"authenticated"}';
-select is((select count(*)::int from public.entries where id = 'e2000000-0000-0000-0000-000000000002'), 1, 'therapist reads the entry shared with them');
+select is((select count(*)::int from public.entries where id = 'e2000000-0000-0000-0000-000000000002'), 0, 'R3: therapist has no direct read of the entry shared with them');
 select is((select count(*)::int from public.entries where id = 'e1000000-0000-0000-0000-000000000001'), 0, 'therapist cannot read the entry not shared with them');
 reset role;
 set local role authenticated;
