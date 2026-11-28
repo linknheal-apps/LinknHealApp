@@ -1,0 +1,128 @@
+{
+  "_readme": [
+    "Lab-only app map. Source of truth for docs/lab/ROADMAP.lab.json.",
+    "Status is COMPUTED by scripts/lab-roadmap.mjs. Never type a status here and never edit this file to flip one.",
+    "Agents may NOT edit this file. Changes go through a PR the owner approves (it is a protected path).",
+    "JSON instead of YAML on purpose: Node has no built-in YAML parser, and the script must run with zero installs.",
+    "`files` are placeholders: a feature counts as built only when ALL its files exist. Adjust them in the PR that builds the feature."
+  ],
+  "name": "Link & Heal Adversarial Lab",
+  "spec": "docs/adversarial-lab.md v0.2",
+  "features": [
+    {
+      "id": "L-00", "group": "Step 0: thin slice",
+      "name": "Thin slice: npm run lab + seed + authenticate helper + twin helper + BASE-02/04/08, and a deliberate using(true) leak turns them red",
+      "depends_on": [], "blocked_by": [],
+      "files": ["package.json", "scripts/lab.mjs", "supabase/tests/00_thin_slice.sql"],
+      "tests": ["BASE-02", "BASE-04", "BASE-08"],
+      "requires_mutation_kill": ["MUT-01"]
+    },
+    {
+      "id": "L-01", "group": "Step 1: foundations",
+      "name": "Cast seed (A to Z + DR1), fixture manifest, control gate that aborts the run, sentinels",
+      "depends_on": ["L-00"], "blocked_by": [],
+      "files": ["seed/cast.sql", "seed/manifest.json", "scripts/control-gate.mjs"],
+      "tests": ["CTL-01"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-02", "group": "Step 1: foundations",
+      "name": "Harness trust: order independence, vacuity ban, ID inventory, protected paths, mutation classes",
+      "depends_on": ["L-00"], "blocked_by": [],
+      "files": ["scripts/lint-tests.mjs", "scripts/mutate.mjs"],
+      "tests": ["SUR-16", "SUR-17"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-03", "group": "Step 2: base matrix",
+      "name": "BASE-01 to BASE-17 with positive controls",
+      "depends_on": ["L-01", "L-02"], "blocked_by": [],
+      "files": ["supabase/tests/10_base.sql"],
+      "tests": ["BASE-01","BASE-02","BASE-03","BASE-04","BASE-05","BASE-06","BASE-07","BASE-08","BASE-09","BASE-10","BASE-11","BASE-12","BASE-13","BASE-14","BASE-15","BASE-16","BASE-17"],
+      "requires_mutation_kill": ["MUT-01","MUT-02","MUT-03"]
+    },
+    {
+      "id": "L-04", "group": "Step 3: P0 attack rows",
+      "name": "Cheap wide gates: surface inventory, catalog lint, EXECUTE grants, owner audit, GraphQL plane",
+      "depends_on": ["L-03"], "blocked_by": [],
+      "files": ["supabase/tests/20_surface.sql"],
+      "tests": ["SUR-01","SUR-02","SUR-03","SUR-04","SUR-05","SUR-18"], "requires_mutation_kill": ["MUT-04"]
+    },
+    {
+      "id": "L-05", "group": "Step 3: P0 attack rows",
+      "name": "Oracles: twin helper, constraint channels, PostgREST shapes, twin column",
+      "depends_on": ["L-03"], "blocked_by": [],
+      "files": ["api-tests/oracles.test.mjs"],
+      "tests": ["SUR-08","SUR-09","SUR-10","CL-13"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-06", "group": "Step 3: P0 attack rows",
+      "name": "Live-table authorization and JWT claims (user_metadata, stale claims, forged tokens)",
+      "depends_on": ["L-03"], "blocked_by": [],
+      "files": ["api-tests/auth.test.mjs"],
+      "tests": ["CL-04","TH-14","SEC-05","SUR-11"], "requires_mutation_kill": ["MUT-05"]
+    },
+    {
+      "id": "L-07", "group": "Step 3: P0 attack rows",
+      "name": "Bypass planes: DEFINER bodies, Edge Functions, secrets in bundle, egress allowlist, pooler",
+      "depends_on": ["L-04"], "blocked_by": [],
+      "files": ["api-tests/bypass.test.mjs", "scripts/scan-bundle.mjs"],
+      "tests": ["SUR-06","SUR-12","SUR-14","SUR-15"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-08", "group": "Step 4: breakup core",
+      "name": "Breakup core P0: canonical link, atomicity, no resurrection, revoke-all, BR-06a",
+      "depends_on": ["L-03"], "blocked_by": ["N3", "N6"],
+      "files": ["supabase/tests/30_breakup.sql"],
+      "tests": ["BR-01","BR-02","BR-03","BR-04","BR-05","BR-06a","BR-07","BR-08","BR-10","BR-17","BR-21","RV-01","SCH-02"],
+      "requires_mutation_kill": ["MUT-06","MUT-07","MUT-08"]
+    },
+    {
+      "id": "L-09", "group": "Step 5: mutation matrix",
+      "name": "Mutation matrix from pg_policy + policy drift diff + evidence freshness",
+      "depends_on": ["L-03", "L-02"], "blocked_by": [],
+      "files": ["scripts/mutate.mjs", "evidence/policies.reviewed.sql"],
+      "tests": ["MUT-ALL"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-10", "group": "Step 6: concurrency",
+      "name": "Deterministic race FL-03 (lock wait is the assertion), FL-02, FL-09",
+      "depends_on": ["L-08"], "blocked_by": [],
+      "files": ["scripts/race-end-link-vs-share.mjs"],
+      "tests": ["FL-03","FL-02","FL-09"], "requires_mutation_kill": ["MUT-09"]
+    },
+    {
+      "id": "L-11", "group": "Step 7: leaks beyond tables",
+      "name": "Realtime column plane, revoke boundary, canary sweep over HTTP",
+      "depends_on": ["L-05"], "blocked_by": [],
+      "files": ["api-tests/realtime.test.mjs", "scripts/canary-sweep.mjs"],
+      "tests": ["SUR-07","CAN-01"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-12", "group": "Step 7: leaks beyond tables",
+      "name": "Storage signed-URL behavior (ST-01) measured early, written exception to M3",
+      "depends_on": ["L-03"], "blocked_by": ["N9"],
+      "files": ["api-tests/storage.test.mjs"],
+      "tests": ["ST-01"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-13", "group": "Step 8: P1 tables",
+      "name": "P1 rows as tables land: requests, couple data, notes, audit, files, notifications",
+      "depends_on": ["L-08"], "blocked_by": ["N1", "N2", "N5", "N10", "D4", "D9"],
+      "files": ["supabase/tests/40_p1.sql"],
+      "tests": ["BR-06b","BR-11","BR-14","BR-16","AU-02","NT-01"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-14", "group": "Step 9: device checks",
+      "name": "MB device checklist (screenshot, privacy screen, back button, biometrics) on real devices",
+      "depends_on": [], "blocked_by": ["BUILT_APP"],
+      "files": ["docs/lab/mb-checklist.md"],
+      "tests": ["MB-01","MB-02","MB-04","MB-06","MB-11","MB-12","MB-13","MB-14"], "requires_mutation_kill": []
+    },
+    {
+      "id": "L-15", "group": "Step 10: tooling",
+      "name": "Lab roadmap script (this file chain) + milestone proposals",
+      "depends_on": ["L-03"], "blocked_by": [],
+      "files": ["scripts/lab-roadmap.mjs", "docs/lab/app-map.lab.json"],
+      "tests": ["RM-01"], "requires_mutation_kill": []
+    }
+  ]
+}
